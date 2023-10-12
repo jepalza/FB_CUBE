@@ -11,7 +11,8 @@ Instalamos usando el fichero "cube_2005_08_22_win32.exe" y entonces copiamos en 
 
 Creamos un BAT en el directorio principal, donde reside el actual "CUBE.BAT" , con un contenido como esto:
   BIN\FBCUBE matador 
-  (donde xxxx es el nombre del mapa que queremos cargar, si lo dejamos vacio, entra el mapa por defecto asginado en el propio motor como "METL3")
+
+(donde xxxx es el nombre del mapa que queremos cargar, si lo dejamos vacio, entra el mapa por defecto asginado en el propio motor como "METL3")
 Y ejecutamos el BAT
 
 Acepta los mismos comandos que el CUBE original, pero he cambiado el orden del comando "-t" que hace "FULLSCREEN", para que por defecto entre siempre en modo "WINDOWED"
