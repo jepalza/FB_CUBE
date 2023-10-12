@@ -1,6 +1,6 @@
 ' adaptacion del motor grafico 3D CUBE (version 1, la ultima conocida)
 ' Por JEPALZA, en OCT. 2023 (jepalza arroba gmail punto com)
-' derechos de uso de cube segun licencia ZLIB
+' derechos de uso de cube segun su propia licencia ZLIB
 '
 ' Cube is freeware, you may use Cube for any purpose as long as you don't blame me for any damages incurred, 
 ' and you may freely distribute the cube archive unmodified on any media. 
@@ -10,9 +10,8 @@
 	#Inclib "cube"
 	
 	' si vamos a probar cosas en OPENGL, necesitamos esto
-	'#Include "fbgfx.bi"
-	
-	#Include "SDL/sdl.bi"
+	#Include "fbgfx.bi"
+	#Include "sdl/SDL.bi"
 	#Include "GL/gl.bi"
 	
 	dim as integer scr_w=1024, scr_h=768
@@ -59,13 +58,12 @@
 	    As string name, team
 	End Type
 	
-	' parametros:
-	'  v=void ,osea, sinparametros
-	'  i=integer
-	'  f=float
-	'  Pc=Zstring
-	'  b=bool
-	'  dynent= entidad TYPE de jugador
+	' v=void,osea,sinparametros
+	' i=integer
+	' f=float
+	' Pc=Zstring
+	' b=bool
+	' dynent= entidad TYPE de jugador
 	
 	Declare function spawnplayer Cdecl Alias "_Z11spawnplayerP6dynenti"(b As Integer, c As integer) As Integer ptr
 	
@@ -107,14 +105,17 @@
    SDL_WM_SetCaption("cube engine", NULL)
    SDL_WM_GrabInput(SDL_GRAB_ON)
    
-   'equivale al comando keyrepeat(false)
-   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY , SDL_DEFAULT_REPEAT_INTERVAL)
+   'keyrepeat(false)
+   Dim As Integer si=0
+   SDL_EnableKeyRepeat(IIf(si , SDL_DEFAULT_REPEAT_DELAY , 0) , SDL_DEFAULT_REPEAT_INTERVAL)
    
    SDL_ShowCursor(0)
    
    gl_init(scr_w, scr_h)
 
    Dim As integer xs, ys
+   'Print *path(newstring("data/newchars.png"))
+   'Print *newstring("data/newchars.png"):sleep
    installtex(2, path(newstring("data/newchars.png")), @xs, @ys)
    installtex(3, path(newstring("data/martin/base.png")), @xs, @ys)
    installtex(6, path(newstring("data/martin/ball1.png")), @xs, @ys)
@@ -133,7 +134,8 @@
     execute("data/menus.cfg")
     execute("data/prefabs.cfg")
     execute("data/sounds.cfg")
-    execfile("config.cfg") ' si no existw, debemos ejecutar antes -> execfile("data/defaults.cfg")
+    execute("servers.cfg")
+    execfile("config.cfg") 'por defecto si no existe . execfile("data/defaults.cfg")
     execute("autoexec.cfg") 
 
 	localconnect()
@@ -172,7 +174,7 @@
       Static As Single fps=30
       fps = (1000.0f/curtime+fps*50)/51
       computeraytable(player1->o.x, player1->o.y)
-      'conoutf("salida: %f,%f", player1.x, player1.y)
+      'conoutf("pepe: %f,%f", player1.x, player1.y)
      
 		readdepth(scr_w, scr_h)
 		
