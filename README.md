@@ -10,7 +10,7 @@ https://sourceforge.net/projects/cube/files/cube/2005_08_22/
 Instalamos usando el fichero "cube_2005_08_22_win32.exe" y entonces copiamos en el directorio "BIN" los dos ficheros CUBE.DLL y FBCUBE.EXE.
 
 Creamos un BAT en el directorio principal, donde reside el actual "CUBE.BAT" , con un contenido como esto:
-  BIN\FBCUBE matador 
+  BIN\FBCUBE xxxx 
 
 (donde xxxx es el nombre del mapa que queremos cargar, si lo dejamos vacio, entra el mapa por defecto asginado en el propio motor como "METL3")
 Y ejecutamos el BAT
