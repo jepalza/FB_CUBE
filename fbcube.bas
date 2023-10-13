@@ -9,8 +9,6 @@
 
 	#Inclib "cube"
 	
-	' si vamos a probar cosas en OPENGL, necesitamos esto
-	#Include "fbgfx.bi"
 	#Include "sdl/SDL.bi"
 	#Include "GL/gl.bi"
 	
@@ -20,11 +18,7 @@
 	Type vec 
 		As Single x
 		As Single y
-	End Type
-	
-	Type jugador
-		As vec o
-		As single yaw
+		As Single z
 	End Type
 
 	Type dynent
@@ -46,7 +40,7 @@
 	    As Integer gunselect, gunwait
 	    As Integer lastaction, lastattackgun, lastmove
 	    As BOOL attacking
-	    As Integer ammo(9)
+	    As Integer ammo(8)
 	    As Integer monsterstate                   ' one of M_* below, M_NONE means human
 	    As Integer mtype                          ' see monster.cpp
 	    As dynent Ptr enemy                      ' monster wants to kill this entity
@@ -55,7 +49,7 @@
 	    As Integer trigger                        ' millis at which transition to another monsterstate takes place
 	    As vec attacktarget                   ' delayed attacks
 	    As Integer anger                          ' how many times already hit by fellow monster
-	    As string name, team
+	    As string names, team
 	End Type
 	
 	' v=void,osea,sinparametros
@@ -64,6 +58,7 @@
 	' Pc=Zstring
 	' b=bool
 	' dynent= entidad TYPE de jugador
+	' PFvvE= ni idea aun , podria ser de llamada a funciones con punteros
 	
 	Declare function spawnplayer Cdecl Alias "_Z11spawnplayerP6dynenti"(b As Integer, c As integer) As Integer ptr
 	
@@ -91,6 +86,10 @@
 	Declare Function path Cdecl Alias "_Z4pathPc"(b As zstring Ptr) As ZString Ptr 
 	
 	Declare sub conoutf Cdecl Alias "_Z7conoutfPKcz"(b As zstring Ptr, ...)
+	
+	' para cargar otro mundo. Sirve, por ejemplo, al pasar de un nivel a otro
+	Declare sub load_world Cdecl Alias "_Z10load_worldPc"(b As zstring Ptr)
+
 
 	Dim As String mapa=Command
 	If mapa="" Then mapa="metl3"
@@ -105,17 +104,14 @@
    SDL_WM_SetCaption("cube engine", NULL)
    SDL_WM_GrabInput(SDL_GRAB_ON)
    
-   'keyrepeat(false)
-   Dim As Integer si=0
-   SDL_EnableKeyRepeat(IIf(si , SDL_DEFAULT_REPEAT_DELAY , 0) , SDL_DEFAULT_REPEAT_INTERVAL)
+   'equivale a -> keyrepeat(false)
+   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL)
    
    SDL_ShowCursor(0)
    
    gl_init(scr_w, scr_h)
 
    Dim As integer xs, ys
-   'Print *path(newstring("data/newchars.png"))
-   'Print *newstring("data/newchars.png"):sleep
    installtex(2, path(newstring("data/newchars.png")), @xs, @ys)
    installtex(3, path(newstring("data/martin/base.png")), @xs, @ys)
    installtex(6, path(newstring("data/martin/ball1.png")), @xs, @ys)
@@ -135,7 +131,7 @@
     execute("data/prefabs.cfg")
     execute("data/sounds.cfg")
     execute("servers.cfg")
-    execfile("config.cfg") 'por defecto si no existe . execfile("data/defaults.cfg")
+    execfile("config.cfg") ' si no existe , hacemos -> execfile("data/defaults.cfg")
     execute("autoexec.cfg") 
 
 	localconnect()
@@ -150,10 +146,10 @@
 	Dim As integer curtime = 10
 
 	Dim As dynent Ptr player1
-	
+
 	While 1
 		Dim As integer millis = SDL_GetTicks()*gamespeed/30
-        
+
 		If(millis-lastmillis>200) Then
 			lastmillis = millis-200
 		ElseIf(millis-lastmillis<1) Then 
@@ -174,14 +170,14 @@
       Static As Single fps=30
       fps = (1000.0f/curtime+fps*50)/51
       computeraytable(player1->o.x, player1->o.y)
-      'conoutf("pepe: %f,%f", player1.x, player1.y)
-     
+      'conoutf("posicion: %f,%f,%f", player1->o.x, player1->o.y, player1->o.z)
+
 		readdepth(scr_w, scr_h)
 		
 		curtime=millis-lastmillis
 		
 		SDL_GL_SwapBuffers()
-		
+
 		If(framesinmap<5) Then
 			player1->yaw += 5
 			gl_drawframe(scr_w, scr_h, fps)
@@ -189,7 +185,6 @@
 		EndIf
 		framesinmap+=1
 		gl_drawframe(scr_w, scr_h, fps)
-
 
 		  Dim as SDL_Event evento
 		  dim as integer lasttype = 0, lastbut = 0
